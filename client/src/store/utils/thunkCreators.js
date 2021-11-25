@@ -95,15 +95,16 @@ const sendMessage = (data, body) => {
 // conversationId will be set to null if its a brand new conversation
 export const postMessage = (body) => (dispatch) => {
   try {
-    const data = saveMessage(body);
+    const data = saveMessage(body)
+      .then( result => {
+        if (!body.conversationId) {
+          dispatch(addConversation(body.recipientId, result.message));
+        } else {
+          dispatch(setNewMessage(result.message));
+        }
 
-    if (!body.conversationId) {
-      dispatch(addConversation(body.recipientId, data.message));
-    } else {
-      dispatch(setNewMessage(data.message));
-    }
-
-    sendMessage(data, body);
+        sendMessage(result, body);
+      })
   } catch (error) {
     console.error(error);
   }
