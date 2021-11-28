@@ -4,6 +4,7 @@ import {
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
+  
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -19,9 +20,13 @@ const ADD_CONVERSATION = "ADD_CONVERSATION";
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
+  const sortedMessageConvos = conversations.map(convo => {
+    convo.messages.reverse();
+    return convo;
+  })
   return {
     type: GET_CONVERSATIONS,
-    conversations,
+    conversations: sortedMessageConvos,
   };
 };
 
