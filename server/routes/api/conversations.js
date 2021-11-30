@@ -22,6 +22,7 @@ router.get("/", async (req, res, next) => {
       order: [[Message, "createdAt", "DESC"]],
       include: [
         { model: Message, order: ["createdAt", "DESC"] },
+        // [sequelize.fn("COUNT", sequelize.col("id"), "numUnreadMessages")],
         {
           model: User,
           as: "user1",
@@ -69,6 +70,15 @@ router.get("/", async (req, res, next) => {
 
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[0].text;
+      convoJSON.notificationCount = await Message.count({
+        where: {
+          conversationId: convoJSON.id,
+          [Op.and]: [
+            {[Op.not]: {senderId: userId}},
+            {readByReceiver: false}
+          ]
+        }
+      })
       conversations[i] = convoJSON;
     }
 
