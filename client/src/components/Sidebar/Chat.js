@@ -1,6 +1,7 @@
 import React from "react";
 import { Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
+import ChatNotification from "./ChatNotification";
 import { makeStyles } from "@material-ui/core/styles";
 import { setActiveChat } from "../../store/activeConversation";
 import { connect } from "react-redux";
@@ -37,6 +38,11 @@ const Chat = (props) => {
         sidebar={true}
       />
       <ChatContent conversation={conversation} />
+      {conversation.notificationCount &&
+        <ChatNotification
+          unreadMessageCount={conversation.notificationCount}
+        />
+      }
     </Box>
   );
 };
