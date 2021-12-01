@@ -86,6 +86,30 @@ router.get("/", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+})
+  // PUT route for changing status of a conversation's unread messages
+  .put("/:id", async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.sendStatus(401);
+      }
+      const userId = req.user.id;
+      const convoId = Number(req.params.id);
+
+      await Message.update(
+        {readByReceiver: true}, {
+          where: {
+            conversationId: convoId,
+            [Op.not]: {senderId: userId},
+            readByReceiver: false
+          }
+        }
+      )
+
+      res.json({id: convoId, notificationCount: 0})
+    } catch (error) {
+      next(error);
+    }
+  });
 
 module.exports = router;

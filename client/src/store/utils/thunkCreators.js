@@ -1,10 +1,12 @@
 import axios from "axios";
 import socket from "../../socket";
+import { setActiveChat } from "../activeConversation";
 import {
   gotConversations,
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  haveReadMessages,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -77,6 +79,15 @@ export const fetchConversations = () => async (dispatch) => {
     console.error(error);
   }
 };
+
+export const readMessages = (convoId) => async (dispatch) => {
+  try {
+    const { data } = await axios.put(`/api/conversations/${convoId}`);
+    dispatch(haveReadMessages(data.id));
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 const saveMessage = async (body) => {
   const { data } = await axios.post("/api/messages", body);
