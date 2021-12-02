@@ -22,7 +22,6 @@ router.get("/", async (req, res, next) => {
       order: [[Message, "createdAt", "DESC"]],
       include: [
         { model: Message, order: ["createdAt", "DESC"] },
-        // [sequelize.fn("COUNT", sequelize.col("id"), "numUnreadMessages")],
         {
           model: User,
           as: "user1",
