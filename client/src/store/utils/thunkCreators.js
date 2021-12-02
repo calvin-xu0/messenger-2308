@@ -82,7 +82,7 @@ export const fetchConversations = () => async (dispatch) => {
 
 export const readMessages = (convoId) => async (dispatch) => {
   try {
-    const { data } = await axios.put(`/api/conversations/${convoId}`);
+    const { data } = await axios.put(`/api/conversations/${convoId}/read-status`);
     dispatch(haveReadMessages(data.id));
   } catch (error) {
     console.error(error);
