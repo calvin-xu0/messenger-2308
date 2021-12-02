@@ -1,7 +1,6 @@
 import React from "react";
-import { Box } from "@material-ui/core";
+import { Badge, Box } from "@material-ui/core";
 import { BadgeAvatar, ChatContent } from "../Sidebar";
-import ChatNotification from "./ChatNotification";
 import { makeStyles } from "@material-ui/core/styles";
 import { setActiveChat } from "../../store/activeConversation";
 import { readMessages } from "../../store/utils/thunkCreators";
@@ -18,13 +17,21 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       cursor: "grab"
     }
+  },
+  unreadCount: {
+    width: "100%",
+    "& .MuiBadge-badge": {
+      top: "50%",
+      right: "5px",
+      fontWeight: "bold"
+    }
   }
 }));
 
 const Chat = (props) => {
   const classes = useStyles();
   const { conversation } = props;
-  const { otherUser } = conversation;
+  const { otherUser, notificationCount } = conversation;
 
   const handleClick = async (conversation) => {
     await props.setActiveChat(conversation.otherUser.username);
@@ -33,18 +40,21 @@ const Chat = (props) => {
 
   return (
     <Box onClick={() => handleClick(conversation)} className={classes.root}>
-      <BadgeAvatar
-        photoUrl={otherUser.photoUrl}
-        username={otherUser.username}
-        online={otherUser.online}
-        sidebar={true}
+      <Badge
+        className={classes.unreadCount}
+        badgeContent={notificationCount}
+        color="primary"
+        children={<>
+          <BadgeAvatar
+            photoUrl={otherUser.photoUrl}
+            username={otherUser.username}
+            online={otherUser.online}
+            sidebar={true}
+          />
+      
+          <ChatContent conversation={conversation}/>
+        </>}
       />
-      <ChatContent conversation={conversation} />
-      {conversation.notificationCount > 0 &&
-        <ChatNotification
-          unreadMessageCount={conversation.notificationCount}
-        />
-      }
     </Box>
   );
 };
