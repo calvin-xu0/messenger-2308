@@ -22,6 +22,10 @@ const READ_MESSAGES = "READ_MESSAGES";
 
 export const gotConversations = (conversations) => {
   const sortedMessageConvos = conversations.map(convo => {
+    convo.otherUserLastReadMsgId = convo.messages.find(message => {
+      return (message.readByReceiver && message.senderId !== convo.otherUser.id)
+    })?.id || null;
+    
     convo.messages.reverse();
     return convo;
   })
