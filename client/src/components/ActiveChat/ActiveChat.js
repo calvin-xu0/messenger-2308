@@ -28,7 +28,6 @@ const ActiveChat = (props) => {
 
   useEffect(() => {
     if (conversation.id && conversation.messages.find(message => !message.readByReceiver && message.senderId === conversation.otherUser.id)) {
-      console.log("reading")
       props.readMessages(conversation.id)
     }
   }, [conversation.messages])
