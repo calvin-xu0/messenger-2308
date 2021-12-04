@@ -1,6 +1,5 @@
 import axios from "axios";
 import socket from "../../socket";
-import { setActiveChat } from "../activeConversation";
 import {
   gotConversations,
   addConversation,
@@ -83,11 +82,8 @@ export const fetchConversations = () => async (dispatch) => {
 export const readMessages = (convoId) => async (dispatch) => {
   try {
     const { data } = await axios.put(`/api/conversations/${convoId}/read-status`);
+    socket.emit("read-messages", convoId)
     dispatch(haveReadMessages(data.id));
-
-    socket.emit("read-messages", {
-      conversationId: data.id
-    })
   } catch (error) {
     console.error(error);
   }
