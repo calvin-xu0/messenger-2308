@@ -4,7 +4,8 @@ import {
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
-  
+  clearUnreadMessagesFromStore,
+  updateOtherUserReadMessagesInStore, 
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -16,11 +17,17 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
+const READ_MESSAGES = "READ_MESSAGES";
+const RECIPIENT_READ = "RECIPIENT_READ";
 
 // ACTION CREATORS
 
 export const gotConversations = (conversations) => {
   const sortedMessageConvos = conversations.map(convo => {
+    convo.otherUserLastReadMsgId = convo.messages.find(message => {
+      return (message.readByReceiver && message.senderId !== convo.otherUser.id)
+    })?.id || null;
+    
     convo.messages.reverse();
     return convo;
   })
@@ -72,6 +79,20 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
+export const haveReadMessages = id => {
+  return {
+    type: READ_MESSAGES,
+    id
+  }
+}
+
+export const recipientReadMessages = id => {
+  return {
+    type: RECIPIENT_READ,
+    id
+  }
+}
+
 // REDUCER
 
 const reducer = (state = [], action) => {
@@ -96,6 +117,10 @@ const reducer = (state = [], action) => {
         action.payload.recipientId,
         action.payload.newMessage
       );
+    case READ_MESSAGES:
+      return clearUnreadMessagesFromStore(state, action.id);
+    case RECIPIENT_READ:
+      return updateOtherUserReadMessagesInStore(state, action.id);
     default:
       return state;
   }

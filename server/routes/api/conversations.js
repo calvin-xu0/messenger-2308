@@ -69,6 +69,15 @@ router.get("/", async (req, res, next) => {
 
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[0].text;
+      convoJSON.notificationCount = await Message.count({
+        where: {
+          conversationId: convoJSON.id,
+          [Op.and]: [
+            {[Op.not]: {senderId: userId}},
+            {readByReceiver: false}
+          ]
+        }
+      })
       conversations[i] = convoJSON;
     }
 
@@ -76,6 +85,42 @@ router.get("/", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+})
+  // PUT route for changing status of a conversation's unread messages
+  .put("/:id/read-status", async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.sendStatus(401);
+      }
+      const userId = req.user.id;
+      const convoId = Number(req.params.id);
+
+      const conversation = await Conversation.findOne({
+        where: {
+          id: convoId
+        }
+      });
+
+      if (!conversation) {
+        return res.sendStatus(404);
+      } else if (![conversation.user1Id, conversation.user2Id].includes(userId)) {
+        return res.sendStatus(403);
+      }
+
+      await Message.update(
+        {readByReceiver: true}, {
+          where: {
+            conversationId: convoId,
+            [Op.not]: {senderId: userId},
+            readByReceiver: false
+          }
+        }
+      )
+
+      res.json({id: convoId})
+    } catch (error) {
+      next(error);
+    }
+  });
 
 module.exports = router;
